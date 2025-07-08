@@ -1,13 +1,5 @@
 // 工具函数模块
 
-// 关闭模态框
-function closeModal() {
-  const modal = document.querySelector(".fixed.inset-0.bg-black.bg-opacity-50");
-  if (modal) {
-    modal.remove();
-  }
-}
-
 // 滚动到指定区域
 function scrollToSection(sectionTitle) {
     var elements = document.querySelectorAll('h3');
@@ -65,9 +57,7 @@ function initThemeToggle() {
 // 键盘事件监听
 function initKeyboardEvents() {
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModal();
-        }
+        // 未来可以添加其他快捷键
     });
 }
 
@@ -168,7 +158,6 @@ function cancelReply(button) {
 }
 
 // 导出函数到全局
-window.closeModal = closeModal;
 window.scrollToSection = scrollToSection;
 window.scrollToTop = scrollToTop;
 window.submitReply = submitReply;

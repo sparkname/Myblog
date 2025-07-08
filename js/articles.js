@@ -21,8 +21,8 @@ function initArticleLinks() {
                 return;
             }
             var articleTitle = this.querySelector('h4').textContent.trim();
-            // TODO: 在这里添加新的文章查看方式
-            alert('点击了文章: ' + articleTitle);
+            // 跳转到文章详情页
+            window.location.href = 'article.html?title=' + encodeURIComponent(articleTitle);
         });
     });
     
@@ -33,8 +33,8 @@ function initArticleLinks() {
         title.addEventListener('click', function(e) {
             e.stopPropagation(); // 阻止事件冒泡
             var articleTitle = this.textContent.trim();
-            // TODO: 在这里添加新的文章查看方式
-            alert('点击了文章标题: ' + articleTitle);
+            // 跳转到文章详情页
+            window.location.href = 'article.html?title=' + encodeURIComponent(articleTitle);
         });
     });
     
@@ -404,80 +404,52 @@ function toggleArticleContent() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // 初始化文章交互功能
   initArticleInteractions();
   initLikeSystem();
   initShareButtons();
 });
 
-// 初始化文章链接、分类、归档等点击事件
 function initArticleInteractions() {
-  // 点击文章链接，显示文章详情
-  document.querySelectorAll(".article-link").forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-      const title = this.closest(".bg-gray-50").querySelector("h4").textContent;
-      showArticle(title);
-    });
-  });
-
-  // 点击分类链接
-  document.querySelectorAll(".category-link").forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
-      alert(`跳转到分类: ${this.textContent}`);
-    });
-  });
-
-  // 点击标签链接
-  document.querySelectorAll('.tag-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      alert('筛选标签: ' + this.textContent);
-    });
-  });
-
-  // 点击归档链接
-  document.querySelectorAll('.archive-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      showArchiveArticles(this.textContent);
-    });
-  });
-
-  // 点击日历日期
-  document.querySelectorAll('.date-link').forEach(link => {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      showDateArticles(this.textContent);
-    });
+  document.querySelectorAll("h4.text-2xl.font-semibold").forEach((titleEl) => {
+    const articleCard = titleEl.closest(".bg-gray-50");
+    if (articleCard) {
+      articleCard.classList.add("cursor-pointer");
+      articleCard.addEventListener("click", () => {
+        const title = titleEl.textContent.trim();
+        showArticle(title);
+      });
+    }
   });
 }
 
-// 显示文章详情弹窗
 function showArticle(title) {
   const article = getArticleDetails(title);
-  const modal = document.createElement("div");
-  modal.className = "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-  modal.innerHTML = `
-    <div class="bg-white rounded-lg max-w-4xl w-full m-4 p-8 max-h-80vh overflow-y-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-3xl font-bold">${title}</h2>
-        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+  const modalBackdrop = document.createElement("div");
+  modalBackdrop.className = "modal-backdrop";
+
+  modalBackdrop.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">${title}</h2>
+        <button class="modal-close-btn" onclick="closeModal()">&times;</button>
       </div>
-      <div class="text-sm text-gray-500 mb-4">
-        <span><i class="fas fa-calendar-alt mr-1"></i> ${article.date}</span>
-        <span class="ml-4"><i class="fas fa-eye mr-1"></i> ${article.views}</span>
-        <span class="ml-4"><i class="fas fa-comments mr-1"></i> ${article.comments}</span>
-        <span class="ml-4"><i class="fas fa-thumbs-up mr-1"></i> ${article.likes}</span>
+      <div class="modal-body">
+        <div class="modal-meta">
+          <span><i class="fas fa-calendar-alt mr-1"></i> ${article.date}</span>
+          <span><i class="fas fa-eye mr-1"></i> ${article.views}</span>
+          <span><i class="fas fa-comments mr-1"></i> ${article.comments}</span>
+          <span><i class="fas fa-thumbs-up mr-1"></i> ${article.likes}</span>
+        </div>
+        <div class="prose">${article.content}</div>
       </div>
-      <div class="prose max-w-none">${article.content}</div>
     </div>
   `;
-  document.body.appendChild(modal);
+
+  document.body.appendChild(modalBackdrop);
+  // Add 'show' class after a short delay to trigger the transition
+  setTimeout(() => modalBackdrop.classList.add('show'), 10);
 }
 
-// 获取文章详情（来自 blog.html 的完整模拟数据）
 function getArticleDetails(title) {
     const articles = {
         '如何编写高质量的JavaScript代码': {
@@ -485,37 +457,60 @@ function getArticleDetails(title) {
             views: '1,523',
             comments: '32',
             likes: '128',
-            content: `...`
+            content: `
+              <h3>代码质量的重要性</h3>
+              <p>高质量的代码是软件项目的基石。它不仅关系到程序是否能正确执行，还直接影响到项目的可维护性、可扩展性和团队协作效率。</p>
+              
+              <h3>命名规范</h3>
+              <p>采用有意义且一致的命名约定是提高代码可读性的第一步。例如，变量名应清晰表达其用途，函数名应体现其功能。</p>
+              <pre><code>// Good
+const userProfile = { name: 'John Doe' };
+function getUserSettings() { ... }
+
+// Bad
+const u_p = { n: 'John Doe' };
+function get_settings() { ... }</code></pre>
+              
+              <h3>模块化设计</h3>
+              <p>将代码拆分为独立的模块，每个模块只负责一项功能。这有助于降低耦合度，提高复用性。</p>
+            `
         },
         '响应式网页设计：从入门到精通': {
             date: '2023年10月25日',
             views: '2,109',
             comments: '45',
             likes: '256',
-            content: `...`
+            content: `
+              <h3>媒体查询</h3>
+              <p>媒体查询是响应式设计的核心。它允许我们根据设备的特性（如视口宽度、分辨率）应用不同的CSS规则。</p>
+              <pre><code>/* For mobile phones: */
+@media only screen and (max-width: 600px) {
+  body {
+    background-color: lightblue;
+  }
+}</code></pre>
+
+              <h3>弹性布局 (Flexbox)</h3>
+              <p>Flexbox提供了一种更有效的方式来对容器中的项目进行布局、对齐和分配空间。</p>
+            `
         },
         '云计算在前端部署中的应用实践': {
             date: '2023年10月24日',
             views: '987',
             comments: '18',
             likes: '92',
-            content: `...`
+            content: `
+              <h3>静态站点托管</h3>
+              <p>利用AWS S3, Netlify, Vercel等服务可以轻松托管静态前端应用，它们通常提供全球CDN加速和自动HTTPS。</p>
+
+              <h3>CI/CD 自动化</h3>
+              <p>使用GitHub Actions或GitLab CI等工具可以实现代码提交后自动构建和部署，大大提高开发效率。</p>
+            `
         }
     };
-    return articles[title] || { content: '未找到文章。' };
+    return articles[title] || { date: 'N/A', views: 'N/A', comments: 'N/A', likes: 'N/A', content: '<h3>文章未找到</h3><p>抱歉，无法加载该文章的内容。</p>' };
 }
 
-// 显示归档文章
-function showArchiveArticles(archiveText) {
-    alert(`显示归档: ${archiveText}`);
-}
-
-// 显示特定日期的文章
-function showDateArticles(dateText) {
-    alert(`显示日期: ${dateText}`);
-}
-
-// 初始化点赞系统 (来自 blog.html 的完整版本)
 function initLikeSystem() {
     document.querySelectorAll('.bg-gray-50').forEach(card => {
         const metaDiv = card.querySelector('.flex.items-center.text-sm.text-gray-500');

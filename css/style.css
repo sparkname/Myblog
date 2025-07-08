@@ -15,11 +15,6 @@
     background: #555;
 }
 
-/* 模态框样式 */
-.max-h-80vh {
-    max-height: 80vh;
-}
-
 /* 图标悬停效果 */
 .icon-hover:hover {
     transform: scale(1.1);
